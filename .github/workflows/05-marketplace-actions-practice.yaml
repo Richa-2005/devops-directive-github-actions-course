@@ -1,0 +1,32 @@
+name : MarketPpace Actions
+
+on: 
+    workflow_dispatch:
+
+
+jobs:
+    marketplace-practice:
+        runs-on: ubuntu-24.04
+ 
+        steps:
+            - uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 
+            - uses: actions/setup-node@d7a11313b581b306c961b506cfc8971208bb03f6 # v4.4.0
+              with:
+                node-version: 20
+            - run: node --version
+            
+            - name: Set current date
+              run: echo "CURRENT_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+            
+            - name: generate file
+              id: marketplace
+              run: | 
+                echo "Name: richa" >> marketplace-practice.txt
+                echo "$CURRENT_DATE" >> marketplace-practice.txt
+                echo "Node version: $(node --version)" >> marketplace-practice.txt
+            
+            - name: Upload artifact
+              uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+              with:
+               name: marketplace-practice.txt
+               path: marketplace-practice.txt
