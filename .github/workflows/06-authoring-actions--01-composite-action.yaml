@@ -39,14 +39,14 @@ jobs:
     runs-on: ubuntu-24.04
     name: Greeting the User
     steps:
-      - uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 
-      
+      - uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
+
       - id: composite-greet
         uses: ./06-authoring-actions/greeting-action
         with:
           person-name: ${{ github.event.inputs.name }}
-      
+
       - env:
           GREETING: ${{ steps.composite-greet.outputs.greeting }}
-        run: echo greeting '$Greeting'
+        run: echo "$GREETING"
         shell: bash
