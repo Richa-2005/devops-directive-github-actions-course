@@ -1,0 +1,25 @@
+name: Greeting Action
+description: Greeting the user
+
+inputs:
+  person-name:
+    description: Name of the user
+    required: true
+    default: 'Richa'
+
+outputs:
+  greeting:
+    description: Greeting the user
+    value: ${{ steps.greet-user.outputs.greeting}}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Greet
+      id: greet-user
+      run: echo "greeting=Hello, welcome to Action, $INPUT_USER_NAME" >> "$GITHUB_OUTPUT"
+      shell: bash
+      env:
+        INPUT_USER_NAME : ${{ inputs.person-name }}
+
+  

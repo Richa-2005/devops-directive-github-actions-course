@@ -1,6 +1,11 @@
 name: Composite Action Demo
 on:
   workflow_dispatch:
+    inputs:
+      name:
+        description: "Name of the person"
+        required: true
+        default: "2"
 
 jobs:
   hello-world-1:
@@ -28,4 +33,20 @@ jobs:
       - env:
           RANDOM_NUMBER: ${{ steps.composite-action-instance.outputs.random-number }}
         run: echo random-number "$RANDOM_NUMBER"
+        shell: bash
+  
+  greet-name:
+    runs-on: ubuntu-24.04
+    name: Greeting the User
+    steps:
+      - uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 
+      
+      - id: composite-greet
+        uses: ./06-authoring-actions/greeting-action
+        with:
+          person-name: ${{ github.event.inputs.name }}
+      
+      - env:
+          GREETING: ${{ steps.composite-greet.outputs.greeting }}
+        run: echo greeting '$Greeting'
         shell: bash
