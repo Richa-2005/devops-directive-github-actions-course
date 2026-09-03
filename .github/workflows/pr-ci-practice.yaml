@@ -1,0 +1,62 @@
+name: PR CI Practice
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    branches:
+      - main
+
+jobs:
+  ci:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5.0.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@d7a11313b581b306c961b506cfc8971208bb03f6 # v4.4.0
+        with:
+          node-version: 20
+
+      - name: Show Node version
+        run: node --version
+
+      - name: Lint
+        run: |
+          echo "Running fake lint check..."
+          test -f README.md
+          echo "Lint passed: README.md exists"
+
+      - name: Test
+        run: |
+          echo "Running fake test..."
+          node -e "console.log('Test passed: Node can execute JavaScript')"
+
+      - name: Build artifact
+        run: |
+          echo "Pull request to main branch on $(date)" > arti.txt
+          echo "Lint: passed" >> arti.txt
+          echo "Test: passed" >> arti.txt
+          echo "Node: $(node --version)" >> arti.txt
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: date-artifact
+          path: arti.txt
+
+  artifact-consumer:
+    name: Consume artifact
+    runs-on: ubuntu-24.04
+    needs: ci
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: date-artifact
+
+      - name: Cat artifact file
+        run: cat arti.txt
