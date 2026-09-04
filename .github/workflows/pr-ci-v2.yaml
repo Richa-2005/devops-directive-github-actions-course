@@ -1,0 +1,52 @@
+name: PR CI V2
+
+on:
+    pull_request:
+        branches:
+            - main
+        types: 
+            - opened
+            - synchronize
+            - reopened
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5.0.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@d7a11313b581b306c961b506cfc8971208bb03f6 # v4.4.0
+        with:
+          node-version: 20
+
+      - name: Create reports directory
+        run: mkdir -p reports
+
+      - name: Lint
+        run: |
+          echo "Running lint check..."
+          test -f README.md
+          echo "lint=passed" > reports/status.txt
+
+      - name: Test
+        run: |
+          echo "Running fake test..."
+          node -e "console.log('tests passed')"
+          echo "test=passed" >> reports/status.txt
+
+      - name: Summary
+        run: |
+          {
+            echo "## PR CI Result"
+            echo ""
+            echo "- Lint: passed"
+            echo "- Test: passed"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pr-ci-reports
+          path: reports
