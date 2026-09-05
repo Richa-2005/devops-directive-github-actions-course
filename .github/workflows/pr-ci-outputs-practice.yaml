@@ -1,0 +1,48 @@
+name: PR CI Outputs Practice
+
+on:
+    pull_request:
+        branches:
+            - main
+        types:
+            - opened
+            - synchronize
+            - reopened
+
+env:
+  APP_NAME: github-actions-practice
+
+jobs:
+    validate:
+        runs-on: ubuntu-24.04
+        outputs:
+             build-id: ${{ steps.build-meta.outputs.build-id }}
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5.0.0
+
+            - name: Build validation id
+              id: build-meta
+              run: echo "build-id=$(date +%s)" >> "$GITHUB_OUTPUT"
+            
+            - name: Printing the Metadata
+              run: |
+                echo "App: $APP_NAME"
+                echo "Build ID: ${{ steps.build-meta.outputs.build-id }}"
+    
+    report:
+        runs-on: ubuntu-24.04
+        needs: validate
+        steps:
+            - name: Make the report
+              run: | 
+                mkdir -p reports
+                echo "app=$APP_NAME" > reports/report.txt
+                echo "build_id=${{ needs.validate.outputs.build-id }}" >> reports/report.txt
+            
+            - name: Upload Artifact
+              uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+              with:
+                name: pr-ci-reports
+                path: reports
+             
